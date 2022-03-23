@@ -13,8 +13,8 @@ class AutoReport():
     Classe para a criação de relatorios automatizado.
     """
     _width = 10
-    _propFactor = 2.6685633001422477
-    _heigth = _width / _propFactor
+    _scaleFactor = 2.6685633001422477
+    _heigth = _width / _scaleFactor
     def __init__(self, dbpath):
         """
         Construtor da classe para criação de relatorios automatizado.
@@ -80,28 +80,32 @@ class AutoReport():
             os.unlink('report.log')
 
             os.system('cls' if os.name == 'nt' else 'clear')
+            print(f'Tipo de dado após tratar {self._t[1]}')
             print('PDF criado com sucesso!')
 
         except Exception as e:
             os.system('cls' if os.name == 'nt' else 'clear')
             print("Erro: ",e)
 
-            abacaxi = 'string teste'
+
 
     def acessData(self):
         dat = sqlite3.connect(self._dbpath)
         query = dat.execute("SELECT * From Aspera")
         cols = [column[0] for column in query.description]
         self._data = pd.DataFrame.from_records(data = query.fetchall(), columns = cols)
-        self._time = [self._data['timestamp'][i].strftime("%H:%M:%S") for i in range(len(self._data['timestamp']))]
 
+        # Trata os dados de tempo
+        self._time = [self._data['timestamp'][i].split(' ')[1] for i in range(len(self._data['timestamp']))]
+        self._time = [datetime.strptime(self._time[i], '%H:%M:%S.%f') for i in range(len(self._time))]
 
     def makeGraphs(self):     
 
         plt.figure(figsize = (self._width, self._heigth))
-        t = pld.date2num(self._data['timestamp'])
-        plt.plot_date(t, self._data['Altitude'], '-', linewidth = 3, label = 'Altitude')
-        plt.xlim([t[0], t[-1]])
+        # self._t = pld.date2num(self._data['timestamp'])
+        self._t = pld.date2num(self._time)
+        plt.plot_date(self._t, self._data['Altitude'], '-', linewidth = 3, label = 'Altitude')
+        plt.xlim([self._t[0], self._t[-1]])
         plt.grid()
         plt.legend()
         plt.savefig('figuras/teste.pdf', bbox_inches = 'tight')
