@@ -12,9 +12,17 @@ class AutoReport():
     """
     Classe para a criação de relatorios automatizado.
     """
-    _width = 10
+    _width = 12
     _scaleFactor = 2.6685633001422477
     _heigth = _width / _scaleFactor
+
+    _width2 = 12
+    _scaleFactor2 = 1.5
+    _heigth2 = _width2 / _scaleFactor2
+
+    # _width3 = 
+    # _scaleFactor3 = 
+    # _height3 = 
     def __init__(self, dbpath):
         """
         Construtor da classe para criação de relatorios automatizado.
@@ -60,7 +68,7 @@ class AutoReport():
             parser.add_argument('-n', '--name',) 
             parser.add_argument('-s', '--school', default= 'Universidade Federal de Juiz de Fora')
             parser.add_argument('-tv', '--testeVariable', default = "Testando a variavel")
-            parser.add_argument('--graficoResposta', default='teste.pdf')
+            parser.add_argument('--altitude', default='altitude.pdf')
 
             args = parser.parse_args()
 
@@ -80,7 +88,6 @@ class AutoReport():
             os.unlink('report.log')
 
             os.system('cls' if os.name == 'nt' else 'clear')
-            print(f'Tipo de dado após tratar {self._t[1]}')
             print('PDF criado com sucesso!')
 
         except Exception as e:
@@ -90,6 +97,9 @@ class AutoReport():
 
 
     def acessData(self):
+        '''
+        Método que acessa o banco de dados e extrai todos os dados
+        '''
         dat = sqlite3.connect(self._dbpath)
         query = dat.execute("SELECT * From Aspera")
         cols = [column[0] for column in query.description]
@@ -98,18 +108,52 @@ class AutoReport():
         # Trata os dados de tempo
         self._time = [self._data['timestamp'][i].split(' ')[1] for i in range(len(self._data['timestamp']))]
         self._time = [datetime.strptime(self._time[i], '%H:%M:%S.%f') for i in range(len(self._time))]
+        self._time = pld.date2num(self._time)
+        print(self._time)
 
     def makeGraphs(self):     
-
-        plt.figure(figsize = (self._width, self._heigth))
-        # self._t = pld.date2num(self._data['timestamp'])
-        self._t = pld.date2num(self._time)
-        plt.plot_date(self._t, self._data['Altitude'], '-', linewidth = 3, label = 'Altitude')
-        plt.xlim([self._t[0], self._t[-1]])
+        '''
+        Método que cria todas as figuras/gráficos para implementar no relatorio.
+        '''
+        #  Gráfico de Altitude
+        fig, axs = plt.subplots(figsize = (self._width, self._heigth))        
+        plt.plot_date(self._time, self._data['Altitude'], '-', linewidth = 1.5, label = 'Altitude')
+        plt.xlim([self._time[0], self._time[-1]])
         plt.grid()
         plt.legend()
-        plt.savefig('figuras/teste.pdf', bbox_inches = 'tight')
+        axs.xaxis.set_major_formatter(pld.DateFormatter('%H:%M:%S'))
+        plt.xlabel('Horário')
+        plt.ylabel('Altitude [m]')
+        plt.title('Variação da altitude do foguete')
+        plt.savefig('figuras/altitude.pdf', bbox_inches = 'tight')
+
+
+        # Gráfico de posicao geografica
+        fig, axs = plt.subplots(2, figsize = (self._width2, self._heigth2))
+        axs[0].set_title('Variação da posição geografica do foguete')
+        axs[0].plot(self._time, self._data['Latitude'], '-', linewidth = 1, label ='Latitude')
+        axs[0].set_xlim([self._time[0], self._time[-1]])
+        axs[0].xaxis.set_major_formatter(pld.DateFormatter('%H:%M:%S'))
+        axs[0].legend(loc='upper right')
+        axs[0].set_ylabel('Coordenada')
+        axs[0].grid()
+
+        axs[1].plot(self._time, self._data['Longitude'], '-', linewidth = 1, label ='Longitude', color = 'tab:orange')
+        axs[1].set_xlim([self._time[0], self._time[-1]])
+        axs[1].xaxis.set_major_formatter(pld.DateFormatter('%H:%M:%S'))
+        axs[1].legend(loc='upper right')
+        axs[1].grid()
+        axs[1].set_xlabel('Tempo')
+        axs[1].set_ylabel('Coordenada')
+
+        plt.savefig('figuras/posicaoGeografica.pdf', bbox_inches = 'tight')
+
+
         plt.show()
+
+
+
+
 
 
 
