@@ -31,35 +31,72 @@ class AutoReport():
 
     def makePDF(self):
         try:
-            content = r'''\documentclass{article}
-            \usepackage[brazilian]{babel}
-            \usepackage[utf8]{inputenc}
-            \usepackage[T1]{fontenc}
-            \usepackage{amsmath}
-            \usepackage{indentfirst}
-            \usepackage{graphicx}
-            \usepackage{multicol,lipsum}
-            \usepackage{float}
-            \usepackage[hidelinks]{hyperref}
-            \usepackage[right = 2cm, left=2cm, top=2cm, bottom=2.5cm]{geometry}
-            
-            \begin{document}
-            \begin{center}
-            \textbf{\huge %(school)s \\}
-            \vspace{1cm}
-            \textbf{\Large %(title)s \\}
-            \end{center}
-            \newpage
-            Aqui sera escrito todo o relatorio etcetcetc    
-            %(testeVariable)s \\
-            aaaaaaaaaaaaaaaaaaaaaaaaaa
-            \begin{figure}[H]
-            \centering
-            \includegraphics[width = \linewidth]{figuras/%(graficoResposta)s}
-            \caption{Respostas transitorias de sistemas din\^amicos.}
-            \label{fig:Respostas}
-            \end{figure}
-            \end{document}
+            content = r'''\documentclass[11pt]{article}
+                            \usepackage[brazilian]{babel}
+                            \usepackage[utf8]{inputenc}
+                            \usepackage[T1]{fontenc}
+                            \usepackage{amsmath}
+                            \usepackage{indentfirst}
+                            \usepackage{graphicx}
+                            \usepackage{multicol,lipsum}
+                            \usepackage{float}
+                            \usepackage[hidelinks]{hyperref}
+                            \usepackage[right = 1cm, left=1cm, top=1cm, bottom=2cm]{geometry}
+                            \usepackage{multicol}
+                            \usepackage{anyfontsize}
+                            \usepackage[export]{adjustbox}
+                            \usepackage{tikz}
+                            \usepackage{xcolor}
+                            \definecolor{my_background}{HTML}{F2F4F3}
+                            \begin{document}
+
+
+                            
+                            \noindent \fcolorbox{black}{my_background} {\fcolorbox{black}{my_background}{% 
+                                
+                                \parbox{\textwidth}{%
+                                
+                                    \begin{minipage}[left]{.48\linewidth}
+                            \begin{figure}[H]
+                                \flushleft
+                                \includegraphics[height = 150px, left]{figuras/logo_supernova (2).png}
+                            \end{figure}
+                            \end{minipage}
+                            \begin{minipage}[right]{.48\linewidth}
+                            \begin{figure}[H]
+                                \includegraphics[height = 150px, right]{figuras/lasc.png}
+                            \end{figure}
+                            \end{minipage}\vspace{10pt}
+
+
+
+                            \begin{minipage}[left]{.55\linewidth}
+                            {\Large
+                            \textbf{Equipe:} \vspace{6pt}
+
+                            \textbf{Competição:} \vspace{6pt}
+
+                            \textbf{Projeto:}\vspace{10pt}
+
+                            \textbf{Missão:}\vspace{6pt}
+                            }
+
+                            \end{minipage}
+                            \begin{minipage}[right]{.42\linewidth}
+                            {\Large
+                            \textbf{Data:}\vspace{6pt}
+
+                            \textbf{Categoria:}\vspace{6pt}
+
+                            \textbf{Local de lançamento:}\vspace{10pt}
+
+                            \textbf{Janela de lançamento:}\vspace{6pt}
+                            }
+                            \end{minipage}
+                                }%
+                            }}
+
+                            \end{document}
             '''
 
             parser = argparse.ArgumentParser()
